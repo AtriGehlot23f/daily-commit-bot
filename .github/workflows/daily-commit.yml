@@ -1,0 +1,28 @@
+name: Daily Commit Bot
+
+on:
+  schedule:
+    - cron: '15 5 * * *'  # Runs every day at 05:15 UTC
+  workflow_dispatch:      # Allow manual trigger too
+
+jobs:
+  update-and-commit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Run update script - 23f3000059@ds.study.iitm.ac.in
+        run: |
+          python3 update_log.py
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add daily_log.txt
+          git commit -m "Automated daily update [skip ci]" || echo "No changes"
+          git push
